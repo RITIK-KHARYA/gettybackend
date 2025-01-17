@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String         @id
+  name                 String
+  email                String
+  bio                  String?
+  emailVerified        Boolean
+  image                String?
+  receivedNotification Notification[] @relation("receipent")
+  issuednotification   Notification[] @relation("issuer")
+  createdAt            DateTime
+  updatedAt            DateTime
+  sessions             Session[]
+  accounts             Account[]
+  likes                Like[]
+  spaces               SpaceUser[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  read        Boolean          @default(false)
+  createdAt   DateTime
+  updatedAt   DateTime         @default(now())
+  receipentid String
+  receipient  User             @relation("receipent", fields: [receipentid], references: [id], onDelete: Cascade)
+  issuerid    String
+  issuer      User             @relation("issuer", fields: [issuerid], references: [id], onDelete: Cascade)
+
+  @@map("notification")
+}
+
+enum NotificationType {
+  LIKE
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Like {
+  userId  String
+  spaceId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+  @@map("likes")
+}
+
+model Space {
+  id                 String      @id @default(cuid())
+  title              String
+  description        String
+  banner             String
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime
+  userid             String
+  users              SpaceUser[]
+  likes              Like[]
+  media              Media[]
+  @@map("space")
+}
+
+model SpaceUser {
+  id       String   @id @default(cuid())
+  userId   String
+  spaceId  String
+  role     Role     @default(MEMEBER)
+  joinedAt DateTime @default(now())
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+  @@map("space_user")
+}
+
+model Media {
+  id               String    @id @default(cuid())
+  Mediatype        MediaType
+  url              String
+  spaceId          String
+  filename         String    @unique
+  originalurl      String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime
+  space            Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  @@unique([spaceId, Mediatype, url])
+  @@map("media")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum Role {
+  ADMIN
+  MEMEBER
+}
