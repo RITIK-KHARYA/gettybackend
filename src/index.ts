@@ -6,6 +6,7 @@ import  userApp from "./api/user";
 import { cors } from "hono/cors";
 import authApp from "./api/auth";
 import { auth } from "./lib/auth";
+import spaceApp from "./api/space";
 
 const app = new Hono<{
   Variables: {
@@ -25,19 +26,6 @@ app.use(
     credentials: true,
   })
 );
-app.use("*", async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    c.set("user", null);
-    c.set("session", null);
-    return next();
-  }
-
-  c.set("user", session.user);
-  c.set("session", session.session);
-  return next();
-});
 
 export const httpServer = serve(app);
 
@@ -47,6 +35,7 @@ const io = new Server(httpServer, {
 
 app.route("/", userApp);
 app.route("/",authApp)
+app.route("/",spaceApp)
 setupWebSocket(io);
 
 httpServer.listen(3000, () => {

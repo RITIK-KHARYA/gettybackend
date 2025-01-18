@@ -9,15 +9,3 @@ const authApp = new Hono()
 });
 export default authApp
 
-
-// export const authClient = createAuthClient({
-//   plugins: [
-//     inferAdditionalFields({
-//       user: {
-//         role: {
-//           type: "string",
-//         },
-//       },
-//     }),
-//   ],
-// });

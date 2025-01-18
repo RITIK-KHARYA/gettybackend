@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma} from  "./prisma"
-import { createAuthClient } from "better-auth/react";
+
 
 
 export const auth = betterAuth({
@@ -29,4 +29,3 @@ export const auth = betterAuth({
   },
   baseURL: "http://localhost:3000",
 });
-export const { signIn, signUp, useSession } = createAuthClient();

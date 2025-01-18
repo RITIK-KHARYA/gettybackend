@@ -9,7 +9,11 @@ const userApp = new Hono<{
   };
 }>().get("/api/user", async (c) => {
   const user = c.get("user")
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    include:{
+      sessions:true
+    }
+  });
   return c.json({ message: "Data received", data: users, user });
 });
 

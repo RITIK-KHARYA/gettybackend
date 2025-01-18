@@ -7,5 +7,5 @@ export const formSchema = z.object({
   bio: z.string().min(10, {
     message: "Username must be at least 2 characters.",
   }),
-  banner: z.string().min(0, "required"),
+  banner: z.string()
 });
