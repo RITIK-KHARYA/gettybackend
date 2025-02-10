@@ -8,13 +8,13 @@ const userApp = new Hono<{
     session: typeof auth.$Infer.Session.session | null;
   };
 }>().get("/api/user", async (c) => {
-  const user = c.get("user")
+
   const users = await prisma.user.findMany({
     include:{
       sessions:true
     }
   });
-  return c.json({ message: "Data received", data: users, user });
+  return c.json({ message: "Data received", data: users});
 });
 
 export default userApp;
