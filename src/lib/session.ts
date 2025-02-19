@@ -5,7 +5,7 @@ export const getServerSession = async(c:Context)=>{
     const session = await auth.api.getSession({
         headers: c.req.raw.headers,
     })
-    console.log(session)
+    console.log(session,"session",)
     if(!session){
         return {
             session: null,

@@ -47,7 +47,7 @@ const spaceApp = new Hono()
         }),
       };
     });
-    return c.json({ data}, 200);
+    return c.json({ data }, 200);
   })
   .post("/api/space", zValidator("json", formSchema), async (c) => {
     const { user } = await getServerSession(c);
@@ -69,7 +69,23 @@ const spaceApp = new Hono()
         userid: user.id,
       },
     });
-    return c.json({ message: "Data received" }, 200);
+    await prisma.spaceUser.upsert({
+      where: {
+        userId_spaceId: {
+          spaceId: space.id,
+          userId: user.id,
+        },
+      },
+      update: {
+        role: "ADMIN",
+      },
+      create: {
+        spaceId: space.id,
+        userId: user.id,
+        role: Role.ADMIN,
+      },
+    });
+    return c.json({ message: "Space created", data: space }, 200);
   });
 
 export default spaceApp;
