@@ -19,21 +19,16 @@ const spaceApp = new Hono()
       );
     }
 
-    const spaces = await prisma.space.findMany({
-      where: {
-        userid: user.id,
-      },
-      include: {
-        users: {
-          where: {
-            role: "ADMIN",
-          },
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
+ const spaces = await prisma.space.findMany({
+   include: {
+     users: {
+       include: {
+         user: true,
+       },
+     },
+   },
+ });
+
     const data = spaces.map((space) => {
       return {
         id: space.id,
@@ -85,7 +80,7 @@ const spaceApp = new Hono()
         role: Role.ADMIN,
       },
     });
-    return c.json({ message: "Space created", data: space }, 200);
+    return c.json({ message: "Space created", data: space}, 200);
   });
 
 export default spaceApp;

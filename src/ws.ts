@@ -1,16 +1,25 @@
 import { Server } from "socket.io";
+import { getServerSession } from "./lib/session";
 
 export const setupWebSocket = (io: Server) => {
-  io.on("connection", (socket) => {
-    console.log("A user connected:", socket.id);
+  const session = getServerSession;
 
-    socket.on("message", (data) => {
-      console.log("Message received:", data);
-      socket.emit("response", { message: "Message received!", data });
-    });
+  try {
+    if (!session) return null;
+    io.on("connection", (socket) => {
+      console.log("A user connected:", socket.id);
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
+      socket.on("message", (data) => {
+        console.log("Message received:", data);
+        socket.emit("response", { message: "Message received!", data });
+      });
+
+      socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+      });
     });
-  });
+  } catch (error) {
+    console.log(error, "error");
+    throw error;
+  }
 };
