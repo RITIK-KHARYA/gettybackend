@@ -7,8 +7,15 @@ import { getServerSession } from "../lib/session";
 import { zValidator } from "@hono/zod-validator";
 import { Role } from "@prisma/client";
 
-const spaceApp = new Hono()
+const spaceApp = new Hono<{
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
+  };
+}>()
   .get("/api/space", async (c) => {
+
+    const startime = new Date().getTime()
     const { user } = await getServerSession(c);
     if (!user) {
       return c.json(
@@ -27,7 +34,10 @@ const spaceApp = new Hono()
           },
         },
       },
+
     });
+    const endtime = new Date().getTime();
+    console.log((endtime - startime) / 1000);
 
     const data = spaces.map((space) => {
       return {
@@ -42,10 +52,8 @@ const spaceApp = new Hono()
         }),
       };
     });
-    c.header(
-      "Cache-Control",
-      "public, max-age=3600, stale-while-revalidate=1800"
-    );
+       
+
     return c.json({ data }, 200);
   })
 
@@ -66,18 +74,16 @@ const spaceApp = new Hono()
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
-    const data = space.map((space) => {
-      return {
-        id: space.id,
-        title: space.title,
-        description: space.description,
-        banner: space.banner,
-        createdAt: space.createdAt,
-        userId: space.userid,
-      };
-    });
-    return c.json({ data }, 200);
+    
+    return c.json({ space }, 200);
   })
   .post("/api/space", zValidator("json", formSchema), async (c) => {
     const { user } = await getServerSession(c);

@@ -14,6 +14,8 @@ const userApp = new Hono<{
       sessions:true
     }
   });
+console.log("hehehehhehehheheh")
+  
   return c.json({ message: "Data received", data: users});
 });
 
