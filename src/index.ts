@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { serve } from "@hono/node-server";
-import { Server } from "socket.io";
 import { setupWebSocket } from "./ws";
 import  userApp from "./api/user";
 import { cors } from "hono/cors";
 import authApp from "./api/auth";
 import { auth } from "./lib/auth";
+import { serve } from "@hono/node-server"
 import spaceApp from "./api/space";
-
+import { Server } from "socket.io";
+import { logger } from "hono/logger";
 const app = new Hono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;
@@ -25,7 +25,10 @@ app.use(
     maxAge: 600,
     credentials: true,
   })
+
 );
+
+app.use("*", logger());
 console.log("abe oyeee")
 export const httpServer = serve(app);
 

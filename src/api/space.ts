@@ -14,8 +14,7 @@ const spaceApp = new Hono<{
   };
 }>()
   .get("/api/space", async (c) => {
-
-    const startime = new Date().getTime()
+    const startime = new Date().getTime();
     const { user } = await getServerSession(c);
     if (!user) {
       return c.json(
@@ -34,7 +33,6 @@ const spaceApp = new Hono<{
           },
         },
       },
-
     });
     const endtime = new Date().getTime();
     console.log((endtime - startime) / 1000);
@@ -48,12 +46,10 @@ const spaceApp = new Hono<{
         createdAt: space.createdAt,
         userId: space.userid,
         spaceAdmin: space.users.map((user) => {
-          return { name: user.user.name, image: user.user.image };
+          return { name: user.user.name, image: user.user.image ,Role: user.role == Role.ADMIN ? "Admin" : "Member"};
         }),
       };
     });
-       
-
     return c.json({ data }, 200);
   })
 
@@ -82,7 +78,7 @@ const spaceApp = new Hono<{
         },
       },
     });
-    
+
     return c.json({ space }, 200);
   })
   .post("/api/space", zValidator("json", formSchema), async (c) => {
