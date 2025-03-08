@@ -30,6 +30,21 @@ const spaceApp = new Hono<{
         users: {
           include: {
             user: true,
+            space: {
+              select: {
+                _count: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            users: {
+              where: {
+                role: Role.MEMEBER,
+              },
+            },
           },
         },
       },
@@ -43,10 +58,16 @@ const spaceApp = new Hono<{
         title: space.title,
         description: space.description,
         banner: space.banner,
+        likes: space._count.likes,
         createdAt: space.createdAt,
+        Role: space._count.users, //count of the users with the role of members
         userId: space.userid,
         spaceAdmin: space.users.map((user) => {
-          return { name: user.user.name, image: user.user.image ,Role: user.role == Role.ADMIN ? "Admin" : "Member"};
+          return {
+            name: user.user.name,
+            image: user.user.image,
+            Role: user.role == Role.ADMIN ? "Admin" : "Member",
+          };
         }),
       };
     });
@@ -78,6 +99,43 @@ const spaceApp = new Hono<{
         },
       },
     });
+
+    return c.json({ space }, 200);
+  })
+  .get("/api/space/:id", async (c) => {
+    const id = c.req.param("id");
+    const { user } = await getServerSession(c);
+    if (!user) {
+      return c.json(
+        {
+          message: "Unauthorized",
+        },
+        401
+      );
+    }
+    const space = await prisma.space.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        title: true,
+        description: true,
+        createdAt: true,
+        banner: true,
+        media: true,
+        _count: {
+          select: {
+            likes: true,
+            media: true,
+            users: true,
+          },
+        },
+        updatedAt: true,
+        id: true,
+      },
+    });
+
+    if (!space) return c.json({ message: "Space not found" }, 404);
 
     return c.json({ space }, 200);
   })
