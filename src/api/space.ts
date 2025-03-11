@@ -121,7 +121,7 @@ const spaceApp = new Hono<{
         title: true,
         description: true,
         createdAt: true,
-        banner: true,
+        banner: true, 
         media: true,
         _count: {
           select: {

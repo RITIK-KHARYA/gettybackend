@@ -1,21 +1,29 @@
 import { Server } from "socket.io";
-import { getServerSession } from "./lib/session";
+ const spaceToSocket = new Map<string, string>();
 
 export const setupWebSocket = (io: Server) => {
-  const session = getServerSession;
-
   try {
-    if (!session) return null;
     io.on("connection", (socket) => {
       console.log("A user connected:", socket.id);
-
-      socket.on("message", (data) => {
-        console.log("Message received:", data);
-        socket.emit("response", { message: "Message received!", data });
-      });
+      socket.on("create",(data)=>{
+        console.log(data)
+        socket.join(data)
+        spaceToSocket.set(socket.id, data);
+      })
+      socket.on("c",(data)=>{
+        console.log(spaceToSocket)
+        const spaceId = spaceToSocket.get(socket.id)
+        console.log(spaceId,data)
+        if(!spaceId){
+          console.log("not here")
+          return
+        }
+        io.to(spaceId).emit("r", data);
+      })
 
       socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
+        socket.disconnect();
       });
     });
   } catch (error) {
