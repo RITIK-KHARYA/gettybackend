@@ -8,6 +8,7 @@ import { serve } from "@hono/node-server"
 import spaceApp from "./api/space";
 import { Server } from "socket.io";
 import { logger } from "hono/logger";
+import messageApp from "./api/message";
 const app = new Hono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;
@@ -39,6 +40,7 @@ const io = new Server(httpServer, {
 app.route("/", userApp);
 app.route("/",authApp)
 app.route("/",spaceApp)
+app.route("/",messageApp)
 
 setupWebSocket(io);
 

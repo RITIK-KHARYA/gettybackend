@@ -14,3 +14,11 @@ export const formSchema2 = z.object({
     message: "Username must be at least 2 characters.",
   }),
 });
+
+export const MessageSchema = z.object({
+  content: z.string(),
+  spaceId: z.string(),
+});
+export const MessageSchema2 = z.object({
+  spaceId: z.string(),
+});
