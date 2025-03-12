@@ -4,8 +4,6 @@ import { auth } from "../lib/auth";
 import { MessageSchema, MessageSchema2 } from "../lib/schema";
 import prisma from "../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
-import { z } from "zod";
-import spaceApp from "./space";
 
 const messageApp = new Hono<{
   Variables: {
@@ -29,6 +27,16 @@ const messageApp = new Hono<{
         content: body.content,
         userId: user.id,
         spaceId: body.spaceId,
+        createdAt: new Date(),
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+        space: true,
       },
     });
     return c.json({ message: "Message created", data: message }, 200);
@@ -47,6 +55,22 @@ const messageApp = new Hono<{
     const messages = await prisma.message.findMany({
       where: {
         spaceId: body.spaceId,
+        userId: user.id,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+            messages: {
+              select: {
+                content: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+        space: true,
       },
       orderBy: {
         createdAt: "desc",
