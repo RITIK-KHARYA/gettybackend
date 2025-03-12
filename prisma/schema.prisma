@@ -11,6 +11,7 @@ model User {
   id                   String         @id
   name                 String
   email                String
+  
   bio                  String?
   emailVerified        Boolean
   image                String?
@@ -20,6 +21,7 @@ model User {
   updatedAt            DateTime
   sessions             Session[]
   accounts             Account[]
+  messages           Message[]
   likes                Like[]
   spaces               SpaceUser[]
 
@@ -110,9 +112,24 @@ model Space {
   userid             String
   users              SpaceUser[]
   likes              Like[]
+  messages           Message[]
   media              Media[]
   @@map("space")
 }
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    String
+  spaceId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@map("message")
+}
+
 
 model SpaceUser {
   id       String   @id @default(cuid())

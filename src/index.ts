@@ -39,6 +39,7 @@ const io = new Server(httpServer, {
 app.route("/", userApp);
 app.route("/",authApp)
 app.route("/",spaceApp)
+
 setupWebSocket(io);
 
 httpServer.listen(3000, () => {
