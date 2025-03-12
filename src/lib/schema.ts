@@ -16,9 +16,13 @@ export const formSchema2 = z.object({
 });
 
 export const MessageSchema = z.object({
-  content: z.string(),
+  message: z.string(),
   spaceId: z.string(),
 });
+
 export const MessageSchema2 = z.object({
-  spaceId: z.string(),
+  message: z.string().min(1, {
+    message: "atleast one character",
+  }),
+  spaceid: z.string(),
 });

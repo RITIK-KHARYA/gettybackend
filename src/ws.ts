@@ -17,7 +17,7 @@ export const setupWebSocket = (io: Server) => {
         if(!spaceId){
           console.log("not here")
           return
-        }
+        } 
         io.to(spaceId).emit("r", data);
       })
 

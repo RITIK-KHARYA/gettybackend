@@ -11,8 +11,9 @@ const messageApp = new Hono<{
     session: typeof auth.$Infer.Session.session | null;
   };
 }>()
-  .post("/api/message", zValidator("json", MessageSchema), async (c) => {
+  .post("/api/message", zValidator("json", MessageSchema2), async (c) => {
     const { user } = await getServerSession(c);
+    console.log(user);
     if (!user) {
       return c.json(
         {
@@ -22,11 +23,12 @@ const messageApp = new Hono<{
       );
     }
     const body = c.req.valid("json");
+    console.log(body);
     const message = await prisma.message.create({
       data: {
-        content: body.content,
+        content: body.message,
         userId: user.id,
-        spaceId: body.spaceId,
+        spaceId: body.spaceid,
         createdAt: new Date(),
       },
       include: {
@@ -54,7 +56,7 @@ const messageApp = new Hono<{
     const body = c.req.valid("json");
     const messages = await prisma.message.findMany({
       where: {
-        spaceId: body.spaceId,
+        spaceId: body.spaceid,
         userId: user.id,
       },
       include: {
