@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
- const spaceToSocket = new Map<string, string>();
+ const spaceToSocket = new Map<string, string>(); //learn more about maps
 
 export const setupWebSocket = (io: Server) => {
   try {

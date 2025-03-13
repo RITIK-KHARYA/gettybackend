@@ -63,6 +63,7 @@ const messageApp = new Hono<{
           select: {
             name: true,
             image: true,
+            id: true,
           },
         },
         space: true,
