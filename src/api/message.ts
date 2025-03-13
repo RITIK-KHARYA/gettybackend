@@ -43,7 +43,8 @@ const messageApp = new Hono<{
     });
     return c.json({ message: "Message created", data: message }, 200);
   })
-  .get("/api/message", zValidator("json", MessageSchema2), async (c) => {
+  .get("/api/space/:spaceid/message", async (c) => {
+    const spaceid = c.req.param("spaceid");
     const { user } = await getServerSession(c);
     if (!user) {
       return c.json(
@@ -53,29 +54,21 @@ const messageApp = new Hono<{
         401
       );
     }
-    const body = c.req.valid("json");
     const messages = await prisma.message.findMany({
       where: {
-        spaceId: body.spaceid,
-        userId: user.id,
+        spaceId: spaceid,
       },
       include: {
         user: {
           select: {
             name: true,
             image: true,
-            messages: {
-              select: {
-                content: true,
-                createdAt: true,
-              },
-            },
           },
         },
         space: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
     });
     return c.json({ messages }, 200);
