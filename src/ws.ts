@@ -18,7 +18,7 @@ export const setupWebSocket = (io: Server) => {
           console.log("not here")
           return
         } 
-        io.to(spaceId).emit("r", data);
+        socket.broadcast.to(spaceId).emit("r", data);
       })
 
       socket.on("disconnect", () => {

@@ -24,4 +24,5 @@ export const MessageSchema2 = z.object({
     message: "atleast one character",
   }),
   spaceid: z.string(),
+  image:z.string()
 });
